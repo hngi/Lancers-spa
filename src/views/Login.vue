@@ -64,7 +64,7 @@ export default {
     methods: {
         login(){
             this.$store.getters.isLoading(this, 'login-btn', 'Please wait..');  
-            this.$store.dispatch('doLogin', {username: this.form.email, password:this.form.password})
+            this.$store.dispatch('doLogin', {email: this.form.email, password:this.form.password})
             .then(response=>{
                 this.$store.getters.hasLoaded(this, 'login-btn', 'Logging In..');
             })

@@ -37,7 +37,7 @@
                     </div>
                     <div class="form-group">
                         <label for="my-password">Password Confirmation</label>
-                        <input required v-model="form.password_confirmation" id="password" class="form-control" type="password" name="my-password" placeholder=""> 
+                        <input required v-model="form.password_confirmation" id="password2" class="form-control" type="password" name="my-password" placeholder=""> 
                         <span id="pmessage" ></span>
                     </div>
                     <div class="clearfix">

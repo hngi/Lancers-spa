@@ -9,8 +9,8 @@ export default new Vuex.Store({
   state: {
     authenticated: false,
 
-    frontend: process.env.VUE_APP_BASE_URL,
-    backend: process.env.VUE_APP_BACKEND_URL,
+    frontend: process.env.VUE_APP_FRONTEND_URL,
+    backend: process.env.VUE_APP_API_URL,
     fileRoot: process.env.VUE_APP_FILEROOT_URL,
 
     loggedUser: {
@@ -18,7 +18,6 @@ export default new Vuex.Store({
         profile: {
             avatar: '',
             name: '',
-            username: '',
             email: '',
         },
         dashboard: {
@@ -47,10 +46,9 @@ export default new Vuex.Store({
     },
 
     SET_USER: (state, profile) => { // Updates loggedUser state with details of logged in user
-        state.loggedUser.profile.name = profile.message.user.name;
-        state.loggedUser.profile.username = profile.message.user.username;
-        state.loggedUser.profile.email = profile.message.user.email;
-        state.loggedUser.profile.avatar = profile.message.user.avatar == null ? 'profile_images/placeholder.png' : profile.message.user.avatar;
+        state.loggedUser.profile.name = profile.name;
+        state.loggedUser.profile.email = profile.email;
+        state.loggedUser.profile.avatar = profile.avatar == null ? 'profile_images/placeholder.png' : profile.message.user.avatar;
     },
 
     DESTROY_TOKEN(state){ // Destroys localStorage session and unsets all values in loggedUser state
@@ -79,7 +77,7 @@ export default new Vuex.Store({
         .then(response => {
             context.commit('DESTROY_TOKEN'); // You can add a promise to return a success code saying loggout successfull
             context.commit('UNSET_USER');
-            router.push('/login')
+            router.push('/')
         })
         .catch(error => {
             //Send a notification to dev
@@ -89,14 +87,14 @@ export default new Vuex.Store({
 
     doLogin: (context, payload) => { // Function for performing the login action
         // Passport authentication requirements, to be passed along side user name and password
-        payload.client_secret = process.env.VUE_APP_CLIENT_SECRET,
-        payload.client_id = process.env.VUE_APP_CLIENT_ID,
-        payload.grant_type = "password"
+        // payload.client_secret = process.env.VUE_APP_CLIENT_SECRET,
+        // payload.client_id = process.env.VUE_APP_CLIENT_ID,
+        // payload.grant_type = "password"
 
         return new Promise((resolve, reject) => {
-        HNG.post(context.state.backend+"oauth/token", payload) // API call to laravel passport token generation route
+        HNG.post(context.state.backend+"login", payload) // API call to laravel passport token generation route
             .then(response => { // if API call for authentication is passed below happens
-                context.commit('SET_TOKEN', {token: response.data.access_token, expiration: response.data.expires_in + Date.now()});
+                context.commit('SET_TOKEN', {token: response.data.data.access_token, expiration: response.data.data.expires_in + Date.now()});
                 
                 context.dispatch('fetchData', {address:'user'})
                 .then(response=>{
@@ -104,7 +102,7 @@ export default new Vuex.Store({
                     router.push('/dashboard')
                 })
                 .catch(error=>{
-                    reject(error.response.data)
+                    reject(error)
                 });               
                 
             })
@@ -138,7 +136,7 @@ export default new Vuex.Store({
                     context.commit('SET_USER', response.data)
                 })
                 .catch(error => {// If error occurs at any stage of loading the user data during refresh, then..
-                    console.log('ERROR FROM AUTOLOGIN loaduser: '+error.response.data) //log error
+                    console.log('ERROR FROM AUTOLOGIN loaduser: '+error) //log error
                     context.commit('DESTROY_TOKEN') // destroy token
                     router.push('/login') // redirect to login
                 })
@@ -175,8 +173,6 @@ export default new Vuex.Store({
                     })
                 })
                 .catch(error => {
-                    if(error.response.status == 401 && error.response.data.message == 'Subscribe') router.push('/membership')
-                    // console.log(error.response.data.message)
                     if(error.response.data.message === 'Unauthenticated.'){
                         context.commit('DESTROY_TOKEN');
                         context.commit('UNSET_USER');
@@ -208,11 +204,24 @@ export default new Vuex.Store({
         return new Promise((resolve, reject) => {
             HNG.post(payload.address, payload.data)
             .then(response => {
-                resolve({
-                    status:true, 
-                    row: Object.keys(response.data).length, 
-                    data:response.data
-                })
+                if(payload.address === '/register'){
+                    context.commit('SET_TOKEN', {token: response.data.data.access_token, expiration: response.data.data.expires_in + Date.now()});
+                    context.dispatch('fetchData', {address:'user'})
+                    .then(response=>{
+                        context.commit('SET_USER', response.data);
+                        router.push('/dashboard')
+                    })
+                    .catch(error=>{
+                        reject(error.response.data)
+                    });   
+                }else{
+                    resolve({
+                        status:true, 
+                        row: Object.keys(response.data).length, 
+                        data:response.data
+                    })
+                }
+                
             })
             .catch(error => {
                 // alert('ERROR FROM POSTDATA: '+error.response.data)

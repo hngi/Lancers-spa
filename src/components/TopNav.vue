@@ -33,8 +33,37 @@
                     <li class="nav-item">
                         <a class="nav-link border-left p-3" href="#"><span class="border rounded-circle p-1 font-weight-bold">AU</span> <span class="d-lg-none d-xl-none"> Hello John</span></a>
                     </li>
+                    <li class="nav-item active">
+                        <a class="nav-link p-3" href="#" @click.prevent="logout"><i class="fas fa-sign-out-alt"></i> <span class="d-lg-none d-xl-none"> Logout</span></a>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 </template>
+
+<script>
+export default {
+  data(){
+      return {
+          newNotifications: false,
+      }
+  },
+
+  methods: {      
+    logout(){
+        this.$store.dispatch('logout');
+    },
+  },
+
+  computed:{
+    profile(){
+        return this.$store.getters.getProfile;
+    },
+
+    rootURL(){
+        return this.$store.getters.getFileRoot;
+    },
+  }
+};
+</script>
