@@ -12,7 +12,7 @@ export default {
   },
 
   created(){
-      if(this.$route.path!=='/login' && this.$route.path!=='/register'){
+      if(this.$route.path!=='/login' && this.$route.path!=='/' && this.$route.path!=='/register'){
           this.$store.dispatch('autoLogin');
       }
   },

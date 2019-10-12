@@ -2,16 +2,16 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios';
 import {HNG} from './api'
-
+import router from './router'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
     authenticated: false,
 
-    base: process.env.FRONTEND_URL,
-    backend: process.env.BACKEND_URL,
-    fileRoot: process.env.FILEROOT_URL,
+    base: process.env.VUE_APP_BASE_URL,
+    backend: process.env.VUE_APP_BACKEND_URL,
+    fileRoot: process.env.VUE_APP_FILEROOT_URL,
 
     loggedUser: {
         action: '',
@@ -89,8 +89,8 @@ export default new Vuex.Store({
 
     doLogin: (context, payload) => { // Function for performing the login action
         // Passport authentication requirements, to be passed along side user name and password
-        payload.client_secret = process.env.CLIENT_SECRET,
-        payload.client_id = process.env.CLIENT_ID,
+        payload.client_secret = process.env.VUE_APP_CLIENT_SECRET,
+        payload.client_id = process.env.VUE_APP_CLIENT_ID,
         payload.grant_type = "password"
 
         return new Promise((resolve, reject) => {
