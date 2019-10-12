@@ -91,7 +91,7 @@ export default {
                 this.regErrors.push(error.errors);
                 this.$store.getters.scroll(0);
             })
-        }
+        },
     }
 }
 </script>

@@ -9,7 +9,7 @@ export default new Vuex.Store({
   state: {
     authenticated: false,
 
-    base: process.env.VUE_APP_BASE_URL,
+    frontend: process.env.VUE_APP_BASE_URL,
     backend: process.env.VUE_APP_BACKEND_URL,
     fileRoot: process.env.VUE_APP_FILEROOT_URL,
 
