@@ -4,7 +4,6 @@ import Router from 'vue-router'
 // import pages
 import Landing from './views/Landing.vue'
 import Pricing from "./views/Pricing.vue"
-import Login from "./views/auth/Login.vue"
 
 Vue.use(Router)
 
@@ -21,11 +20,6 @@ export default new Router({
       path: '/pricing',
       name: 'Pricing',
       component: Pricing
-    },
-    {
-      path: '/login',
-      name: 'Sign In',
-      component: Login
     },
     {
       path: '/about',
