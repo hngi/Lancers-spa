@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import IndexPage from './views/Index.vue'
+import Landing from './views/Landing.vue'
 import Login from './views/Login.vue'
 import Register from './views/Register.vue'
 import Dashboard from './views/Dashboard.vue'
@@ -14,8 +14,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Index',
-      component: IndexPage,
+      name: 'Landing',
+      component: Landing,
       meta: { forAuth: false }
     },
     {
