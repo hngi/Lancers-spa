@@ -1,16 +1,288 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import axios from 'axios';
+import {HNG} from './api'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    authenticated: false,
 
+    base: process.env.FRONTEND_URL,
+    backend: process.env.BACKEND_URL,
+    fileRoot: process.env.FILEROOT_URL,
+
+    loggedUser: {
+        action: '',
+        profile: {
+            avatar: '',
+            name: '',
+            username: '',
+            email: '',
+        },
+        dashboard: {
+            //
+        },
+        token: "",
+        tokenExpires: "",
+    },
   },
+
   mutations: {
+    SET_TOKEN(state, payload) { // Assign generated token and expiration date to browser local storage and mutate values in state
+        if(payload.reset){ // Only the autoLogin action passes a reset parameter to the payload object, hence in case of page refresh, logged in user's token is gotten back from local storage and reassigned to store state
+          state.loggedUser.token =  payload.token,
+          state.loggedUser.tokenExpires = payload.expiration
+          state.authenticated = true
+          state.loggedUser.action = "Page was refreshed"
+        }else{ // doLogin has brought in a new user, so set new users token and expiration in local storage and update same in the store state
+          localStorage.setItem('lancers_token', payload.token)
+          localStorage.setItem('lancers_expiration', payload.expiration)
+          //refresh_token = ""
+          state.loggedUser.token = payload.token,
+          state.loggedUser.tokenExpires = payload.expiration
+          state.authenticated = true
+        }
+    },
 
+    SET_USER: (state, profile) => { // Updates loggedUser state with details of logged in user
+        state.loggedUser.profile.name = profile.message.user.name;
+        state.loggedUser.profile.username = profile.message.user.username;
+        state.loggedUser.profile.email = profile.message.user.email;
+        state.loggedUser.profile.avatar = profile.message.user.avatar == null ? 'profile_images/placeholder.png' : profile.message.user.avatar;
+    },
+
+    DESTROY_TOKEN(state){ // Destroys localStorage session and unsets all values in loggedUser state
+        localStorage.removeItem('lancers_token')
+        localStorage.removeItem('lancers_expiration')
+    },
+
+    UNSET_USER: (state) => { // Updates loggedUser state with details of logged in user
+        state.loggedUser = {
+            profile: {
+                avatar: 'profile_images/placeholder.png',
+                name: '',
+                username: '',
+                email: '',
+            },
+            dashboard: '',
+            token: "",
+            tokenExpires: "",
+        }
+    },
   },
-  actions: {
 
+  actions: {
+    logout: (context) => { // Logs out the user and destroys token
+        context.dispatch('postData', {address: 'logout'})
+        .then(response => {
+            context.commit('DESTROY_TOKEN'); // You can add a promise to return a success code saying loggout successfull
+            context.commit('UNSET_USER');
+            router.push('/login')
+        })
+        .catch(error => {
+            //Send a notification to dev
+            console.log(error);
+        })      
+    },
+
+    doLogin: (context, payload) => { // Function for performing the login action
+        // Passport authentication requirements, to be passed along side user name and password
+        payload.client_secret = process.env.CLIENT_SECRET,
+        payload.client_id = process.env.CLIENT_ID,
+        payload.grant_type = "password"
+
+        return new Promise((resolve, reject) => {
+        HNG.post(context.state.backend+"oauth/token", payload) // API call to laravel passport token generation route
+            .then(response => { // if API call for authentication is passed below happens
+                context.commit('SET_TOKEN', {token: response.data.access_token, expiration: response.data.expires_in + Date.now()});
+                
+                context.dispatch('fetchData', {address:'user'})
+                .then(response=>{
+                    context.commit('SET_USER', response.data);
+                    router.push('/dashboard')
+                })
+                .catch(error=>{
+                    reject(error.response.data)
+                });               
+                
+            })
+            .catch(error=>{
+                reject(error.response.data)
+            })
+        })
+    },
+
+    autoLogin: context => { // Used in App.vue to persist user login state in case of page reload
+        let token = localStorage.getItem('lancers_token')
+        let expiration = localStorage.getItem('lancers_expiration')
+  
+        if(! token || ! expiration) // check if token and expiration is not set
+        {
+          context.commit('DESTROY_TOKEN') // Just incase only one of the 2 is set, destroy all of it
+          router.push('/login') // then redirect to login
+        }
+        else
+        {
+          if(Date.now() > parseInt(expiration)) // if the 2 is set above, then check if the token has expired
+          {
+            context.commit('DESTROY_TOKEN') // destroy the expired token
+            router.push('/login') // then redirect to login
+          }
+          else
+          {
+            context.dispatch('fetchData', {address:'user'})
+                .then(response=>{
+                    context.commit('SET_TOKEN', {token: token, expiration: expiration, reset: true}) // commit SET_TOKEN to reset token and expiration in state
+                    context.commit('SET_USER', response.data)
+                })
+                .catch(error => {// If error occurs at any stage of loading the user data during refresh, then..
+                    console.log('ERROR FROM AUTOLOGIN loaduser: '+error.response.data) //log error
+                    context.commit('DESTROY_TOKEN') // destroy token
+                    router.push('/login') // redirect to login
+                })
+          }
+        }
+      },
+
+    /**
+     *| UNIVERSAL ACTION FOR FETCHing/GETing API DATA 
+    */
+    fetchData: (context, payload) => {
+        // INJECT TOKEN INTO REQUEST
+        HNG.interceptors.request.use(function (request) {
+            const token = payload.lancers_token ? payload.lancers_token : context.getters.getToken;
+            if ( token != null ) {
+                request.headers.Authorization = `Bearer ${token}`;
+            }
+            return request;
+        }, function (error) {
+            // alert('ERROR FROM POSTDATA INTERECEPTOR: '+error.response.data);
+            return Promise.reject(error.response.data);
+        });
+        
+        /**
+         * Returning a promise to determine if action is still loading, failed or completed successfully
+         */
+        return new Promise((resolve, reject) => {
+            HNG.get(payload.address)
+                .then(response => {
+                    resolve({
+                        status:true, 
+                        row: Object.keys(response.data).length, 
+                        data:response.data
+                    })
+                })
+                .catch(error => {
+                    if(error.response.status == 401 && error.response.data.message == 'Subscribe') router.push('/membership')
+                    // console.log(error.response.data.message)
+                    if(error.response.data.message === 'Unauthenticated.'){
+                        context.commit('DESTROY_TOKEN');
+                        context.commit('UNSET_USER');
+                        router.push('/login')
+                    }
+                    // alert('ERROR FROM FETCHDATA: '+error.response.data);
+                    reject(error.response.data)
+                })
+        })
+    },
+
+    postData: (context, payload) => {
+        /**
+         * SETTING REQUEST INTERCEPTOR FOR TOKEN
+         **/
+        HNG.interceptors.request.use(request => {
+            const token = context.getters.getToken;
+            if ( token != null ) {
+                request.headers.Authorization = `Bearer ${token}`;
+            }
+            return request;
+          },
+          error => {
+            // alert('ERROR FROM POSTDATA INTERECEPTOR: '+error.response.data);
+            return Promise.reject(error.response.data);
+          });
+
+        // Returning a promise to determine if action is still loading, failed or completed successfully
+        return new Promise((resolve, reject) => {
+            HNG.post(payload.address, payload.data)
+            .then(response => {
+                resolve({
+                    status:true, 
+                    row: Object.keys(response.data).length, 
+                    data:response.data
+                })
+            })
+            .catch(error => {
+                // alert('ERROR FROM POSTDATA: '+error.response.data)
+                reject(error.response.data)
+            })
+        })
+    },
+  },
+
+  getters: {
+    isAuth(state){ 
+        return state.isAuth;
+    },               
+    getToken(state){
+        let token;
+        let expiration;
+        if(state.loggedUser.token && state.loggedUser.tokenExpires){
+          token = state.loggedUser.token
+          expiration = state.loggedUser.tokenExpires
+        }else{ // If data in state changes but local storage still has token and expiration then use localstorage to set token and expiration
+          token = localStorage.getItem('lancers_token')
+          expiration = localStorage.getItem('lancers_expiration')
+        }
+  
+        if(! token || ! expiration) // check if token exists now or return null
+        {
+          return null
+        }
+        else
+        {
+          if(Date.now() > parseInt(expiration)) // check if existing token has expired and return null if true or return true if otherwise
+          {
+            return null
+          }
+          else
+          {
+            return token
+          }
+        }
+    },
+    getDashboardData(state){ 
+        return state.loggedUser.dashboard; 
+    },     
+    getFileRoot(state){
+        return state.fileRoot;
+    },
+    isLoading:(state)=>(objectContext, btnId='', btnValue=null)=>{
+        objectContext.loading = true;
+        objectContext.error = null;  
+        if(btnId !== ''){
+            document.getElementById(btnId).disabled = true;
+            document.getElementById(btnId).style = 'opacity: 0.5';
+        }            
+        if(btnValue !== null) document.getElementById(btnId).innerHTML = btnValue;
+    },
+    hasLoaded:(state)=>(objectContext, btnId='', btnValue=null)=>{ 
+        objectContext.loading = false; 
+        if(btnId !== ''){
+            document.getElementById(btnId).disabled = false;
+            document.getElementById(btnId).style = 'opacity: 1';
+        }
+        if(btnValue !== null) document.getElementById(btnId).innerHTML = btnValue;
+    },
+    
+    scroll:(state)=>(top=0, left=0)=>{
+        window.scrollTo({
+            top: top,
+            left: left,
+            behavior: 'smooth'
+        });
+    },
   }
 })
