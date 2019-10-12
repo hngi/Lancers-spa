@@ -4,6 +4,7 @@ import IndexPage from './views/Index.vue'
 import Login from './views/Login.vue'
 import Register from './views/Register.vue'
 import Dashboard from './views/Dashboard.vue'
+import Pricing from "./views/Pricing.vue"
 
 Vue.use(Router)
 
@@ -15,6 +16,12 @@ export default new Router({
       path: '/',
       name: 'Index',
       component: IndexPage,
+      meta: { forAuth: false }
+    },
+    {
+      path: '/pricing',
+      name: 'Pricing',
+      component: Pricing,
       meta: { forAuth: false }
     },
     {
@@ -33,7 +40,7 @@ export default new Router({
       path: '/dashboard',
       name: 'Dashboard',
       component: Dashboard,
-      meta: { forAuth: false }
+      meta: { forAuth: true }
     },
   ]
 })
