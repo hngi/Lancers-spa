@@ -87,16 +87,16 @@ export default new Vuex.Store({
     },
     SET_ESTIMATE: (state, payload)=>{
         state.estimateForm.step = 3;
-        state.estimateForm.evaluation.hours = payload.hours, 
+        state.estimateForm.evaluation.time = payload.time, 
         state.estimateForm.evaluation.price_per_hour = payload.price_per_hour, 
         state.estimateForm.evaluation.start = payload.start, 
         state.estimateForm.evaluation.end = payload.end, 
         state.estimateForm.evaluation.equipment_cost = payload.equipment_cost, 
         state.estimateForm.evaluation.sub_contractors = payload.sub_contractors, 
         state.estimateForm.evaluation.sub_contractors_cost = payload.sub_contractors_cost, 
-        state.estimateForm.evaluation.similar_project = payload.similar_project, 
+        state.estimateForm.evaluation.similar_projects = payload.similar_projects, 
         state.estimateForm.evaluation.rating = payload.rating, 
-        state.estimateForm.evaluation.currency = payload.currency
+        state.estimateForm.evaluation.currency_id = payload.currency_id
     },
 
     SELECT_CLIENT: (state, payload)=>{

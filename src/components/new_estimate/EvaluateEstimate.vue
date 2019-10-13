@@ -42,20 +42,20 @@
                 <h3>Billing</h3>
                 <div>
                     <p>How long (in hours) will it take you to complete this project?</p>
-                    <input type="number" v-model="estimate.hours" name="estTime" placeholder="Hours" />
+                    <input type="number" v-model="estimate.time" name="estTime" placeholder="Hours" />
                 </div>
                 <br />
                 <div>
                     <p>How much (in hours) do you charge per hour?</p>
-                    <input type="text" v-model="estimate.charge_per_hour" name="estPrice" placeholder="NGN 0.00" />
+                    <input type="text" v-model="estimate.price_per_hour" name="estPrice" placeholder="NGN 0.00" />
                 </div>
                 <br />
                 <div class="date">
                     <p>Project starts/ends</p>
                     <i class="fa fa-calendar"></i>
-                    <input type="text" onfocus="(this.type='date')" v-model="estimate.start_date" name="estStartDate" placeholder=" Set start date" />
+                    <input type="text" onfocus="(this.type='date')" v-model="estimate.start" name="estStartDate" placeholder=" Set start date" />
                     <i class="fa fa-calendar"></i>
-                    <input type="text" onfocus="(this.type='date')" v-model="estimate.end_date" name="estEndDate" placeholder="Set end date" />
+                    <input type="text" onfocus="(this.type='date')" v-model="estimate.end" name="estEndDate" placeholder="Set end date" />
                 </div>
             </div>
 
@@ -72,13 +72,13 @@
 
             <div>
                 <p id="sub">Are you subcontracting to anyone?</p>
-                <input type="text" name="est2" v-model="estimate.subcontractors" id="est2" placeholder="E.g. Illustrator, Consulting..." />
+                <input type="text" name="est2" v-model="estimate.sub_contractors" id="est2" placeholder="E.g. Illustrator, Consulting..." />
             </div>
             <br />
 
             <div>
                 <p id="pay">How much would they be paid?</p>
-                <input type="text" v-model="estimate.subcontractors_fee" name="est3" id="est3" placeholder="NGN 0.00" />
+                <input type="text" v-model="estimate.sub_contractors_cost" name="est3" id="est3" placeholder="NGN 0.00" />
             </div>
             <!-- Slack Display Name: Akosworldwide, GitHub Username: Akosworldwide -->
 
@@ -88,7 +88,7 @@
             <div>
                 <p id="proj">How many similar projects have
                     <br>you done before?</p>
-                <input type="number" v-model="estimate.similar_project" name="exp1" id="exp1">
+                <input type="number" v-model="estimate.similar_projects" name="exp1" id="exp1">
             </div>
 
             <br>
@@ -105,42 +105,8 @@
             Slack UserName: @Mary_Jonah -->
             <div id="currency">
                 Currency:
-                <select v-model="estimate.currency">
-                    <option>NGN</option>
-                    <option>AED</option>
-                    <option>AFN</option>
-                    <option>ALL</option>
-                    <option>AMD</option>
-                    <option>ANG</option>
-                    <option>AOA</option>
-                    <option>ARS</option>
-                    <option>AUD</option>
-                    <option>AWG</option>
-                    <option>AZN</option>
-                    <option>BAM</option>
-                    <option>BBD</option>
-                    <option>BDT</option>
-                    <option>BGN</option>
-                    <option>BHD</option>
-                    <option>BIF</option>
-                    <option>BMD</option>
-                    <option>BND</option>
-                    <option>BOB</option>
-                    <option>BRL</option>
-                    <option>BSD</option>
-                    <option>BSD</option>
-                    <option>BTN</option>
-                    <option>BWP</option>
-                    <option>BYN</option>
-                    <option>BZD</option>
-                    <option>CAD</option>
-                    <option>CDF</option>
-                    <option>CHF</option>
-                    <option>CLP</option>
-                    <option>CNY</option>
-                    <option>COP</option>
-                    <option>CRC</option>
-                    <option>CUC</option>
+                <select v-model="estimate.currency_id">
+                    <option v-for="(currency, id) in currencies" :key="id" :value="currency.id">{{currency.code}}</option>
                 </select>
 
             </div>
@@ -156,18 +122,33 @@ export default {
     data(){
         return {
             estimate: {
-                hours: '9',
-                charge_per_hour: '100',
-                start_date: '2019-10-10',
-                end_date: '2019-10-10',
+                time: '9',
+                price_per_hour: '100',
+                start: '2019-10-10',
+                end: '2019-10-10',
                 equipment_cost: '100',
-                subcontractors: 'test',
-                subcontractors_fee: '100',
-                similar_project: '1',
+                sub_contractors: 'test',
+                sub_contractors_cost: '100',
+                similar_projects: '1',
                 rating: '3',
-                currency: 'NGN'
-            }
+                currency_id: 'NGN',
+                project_id: null
+            },
+            currencies: []
         }
+    },
+    created(){
+      // console.log(this.$store.state.estimateForm.project.project_id);
+      this.estimate.project_id = this.$store.state.estimateForm.project.project_id;
+
+      this.$store.dispatch('fetchData', {address: `/data/currencies`})
+            .then(data => {
+                this.currencies = data.data.data;
+                console.log(this.currencies);
+            })
+            .catch(e => {
+                console.log(e);
+            });
     },
     methods: {
         next(){
@@ -179,8 +160,8 @@ export default {
             }
             this.$store.dispatch('postData', {address: '/estimates', data: { ...this.estimate}})
               .then( data => {
-                  console.log(data.data.data);
-                  // this.$store.commit('SET_ESTIMATE', this.estimate);
+                  let estimate = data.data.data;
+                  this.$store.commit('SELECT_CLIENT', this.estimate);
               })
               .catch(e => {
 
