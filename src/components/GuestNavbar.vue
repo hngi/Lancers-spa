@@ -41,7 +41,7 @@ export default {
                 },
                 {
                     text: "Sign up",
-                    path: "/signup"
+                    path: "/register"
                 }
             ]
         }
