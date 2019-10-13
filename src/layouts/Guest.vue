@@ -22,7 +22,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
     .text-primary{
         color: var(--primary-color) !important;
     }
