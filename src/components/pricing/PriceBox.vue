@@ -7,7 +7,7 @@
                 </h5>
             </div>
             <ul class="pricelist pt-3">
-                <p class="m-0" style="font-size: 12px" v-if="name !== 'Starter'">{{plan.addText}}</p>
+                <p class="m-0" style="font-size: 12px" v-if="plan.name !== 'Starter'">{{plan.addText}}</p>
                 <li v-for="(feature, id) in plan.features" :key="id">
                     <span>
                         <svg width="16" height="16" viewBox="0 0 22 22" fill="none"  xmlns="http://www.w3.org/2000/svg">
@@ -34,7 +34,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
     .pricing-header {
         background: #091429
     }
