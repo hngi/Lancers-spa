@@ -26,6 +26,15 @@ export default new Vuex.Store({
         token: "",
         tokenExpires: "",
     },
+
+    estimateForm: {
+        step: 4,
+        project: { },
+        evaluation: {},
+        client: {
+            clientInfo: {}
+        },
+    }
   },
 
   mutations: {
@@ -68,6 +77,45 @@ export default new Vuex.Store({
             token: "",
             tokenExpires: "",
         }
+    },
+
+    SELECT_PROJECT: (state, payload)=>{
+        state.estimateForm.step = 2;
+        state.estimateForm.project.type = payload.new !== '' ? 'new' : 'old';
+        state.estimateForm.project.title = payload.new !== '' ? payload.new : payload.old;
+    },
+    SET_ESTIMATE: (state, payload)=>{
+        state.estimateForm.step = 3;
+        state.estimateForm.evaluation.hours = payload.hours, 
+        state.estimateForm.evaluation.charge_per_hour = payload.charge_per_hour, 
+        state.estimateForm.evaluation.start_date = payload.start_date, 
+        state.estimateForm.evaluation.end_date = payload.end_date, 
+        state.estimateForm.evaluation.equipment_cost = payload.equipment_cost, 
+        state.estimateForm.evaluation.subcontractors = payload.subcontractors, 
+        state.estimateForm.evaluation.subcontractors_fee = payload.subcontractors_fee, 
+        state.estimateForm.evaluation.similar_project = payload.similar_project, 
+        state.estimateForm.evaluation.rating = payload.rating, 
+        state.estimateForm.evaluation.currency = payload.currency
+    },
+
+    SELECT_CLIENT: (state, payload)=>{
+        state.estimateForm.step = 4;
+        state.estimateForm.client.type = payload.client;
+    },
+
+    SET_CLIENT_INFO: (state, payload)=>{
+        state.estimateForm.step = 5;
+        state.estimateForm.client.clientInfo.company_name = payload.company_name,
+        state.estimateForm.client.clientInfo.stret = payload.stret,
+        state.estimateForm.client.clientInfo.number = payload.number,
+        state.estimateForm.client.clientInfo.city = payload.city,
+        state.estimateForm.client.clientInfo.zip = payload.zip,
+        state.estimateForm.client.clientInfo.country = payload.country,
+        state.estimateForm.client.clientInfo.state = payload.state,
+        state.estimateForm.client.clientInfo.contacts = payload.contacts
+    },
+    PREVIOUS_FORM: (state, payload)=>{
+        if(payload.form === 'estimateForm') state.estimateForm.step = state.estimateForm.step - 1;
     },
   },
 
@@ -268,6 +316,10 @@ export default new Vuex.Store({
     getFileRoot(state){
         return state.fileRoot;
     },
+    getEstimateForm(state){
+        return state.estimateForm;
+    },
+
     isLoading:(state)=>(objectContext, btnId='', btnValue=null)=>{
         objectContext.loading = true;
         objectContext.error = null;  
