@@ -16,6 +16,22 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 Vue.config.productionTip = false
 
+Vue.filter('capsfirst', function (value) {
+  if (value !== null) {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  } else {
+    return "";
+  }
+});
+
+Vue.filter('slashtime', function (value) {
+  return value.replace(/-/gi, "/");
+});
+
+Vue.filter('formatnum', function (value) {
+  return value.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+});
+
 
 router.beforeEach(
   (to, from, next)=>{

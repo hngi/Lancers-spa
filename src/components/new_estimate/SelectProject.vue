@@ -33,9 +33,8 @@
                         </p>
                         <div class="contents dropdown">
                             <select v-model="project.old" class="dropbtn" name="" id="projectSelect">
-                                <option selected value="">Select Project</option>
-                                <option>Glacier Fintech App</option>
-                                <option> AB Technology Solutions Branding</option>
+                                <option selected value="">{{ previous.length > 0 ? 'Select Project' : 'No projects to select'}}</option>
+                                <option v-for="(proj, id) in previous" :key="id" :value="id">{{proj.title}}</option>
                             </select>  
                             <!-- <i class="fa fa-caret-down"></i> -->                            
                         </div>
@@ -66,17 +65,44 @@ export default {
             project: {
                 new: '',
                 old: '',
-            }
+                id: null
+            },
+            previous: []
         }
     },
     methods: {
         next(){
-            if(this.project.new === ''  && this.project.old === '') alert('Please select a project of specify new project title')
-            else this.$store.commit('SELECT_PROJECT', this.project);
-        },
-        previous(){
-            this.$store.commit('PREVIOUS_FORM');
+            let type = this.project.new !== '' ? 'new' : 'old';
+            let title = this.project.new === '' ? this.project.old : this.project.new;
+            if(this.project.new === ''  && this.project.old === '') {
+                alert('Please select a project of specify new project title')
+            }else {
+                if(type == 'new'){
+                    this.$store.dispatch('postData', {address: '/projects', data: { title: title}})
+                        .then( data => {
+                            this.project.id = data.data.data.id;
+                            this.$store.commit('SELECT_PROJECT', this.project);
+                        })
+                        .catch(e => {
+    
+                        });
+                }else{
+                    this.project.old = this.previous[title]['title'];
+                    this.project.id = this.previous[title]['id'];
+
+                    this.$store.commit('SELECT_PROJECT', this.project);
+                }
+            }
         }
+    },
+    created(){
+        this.$store.dispatch('fetchData', {address: `/projects/names`})
+            .then(data => {
+                this.previous = data.data;
+            })
+            .catch(e => {
+                console.log(e)
+            });
     }
 }
 </script>
