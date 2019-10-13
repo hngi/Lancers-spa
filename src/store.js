@@ -28,7 +28,7 @@ export default new Vuex.Store({
     },
 
     estimateForm: {
-        step: 4,
+        step: 5,
         project: { },
         evaluation: {},
         client: {
@@ -129,7 +129,6 @@ export default new Vuex.Store({
         })
         .catch(error => {
             //Send a notification to dev
-            console.log(error);
         })      
     },
 
@@ -232,7 +231,7 @@ export default new Vuex.Store({
         })
     },
 
-    postData: (context, payload) => {
+    postData: (context, payload, method='post') => {
         /**
          * SETTING REQUEST INTERCEPTOR FOR TOKEN
          **/
@@ -250,7 +249,9 @@ export default new Vuex.Store({
 
         // Returning a promise to determine if action is still loading, failed or completed successfully
         return new Promise((resolve, reject) => {
-            HNG.post(payload.address, payload.data)
+            method.toLowerCase() == 'put' ? HNG.put(payload.address, payload.data)
+            :method.toLowerCase() == 'delete' ? HNG.delete(payload.address, payload.data)
+            :HNG.post(payload.address, payload.data)
             .then(response => {
                 if(payload.address === '/register'){
                     context.commit('SET_TOKEN', {token: response.data.data.access_token, expiration: response.data.data.expires_in + Date.now()});

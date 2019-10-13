@@ -178,6 +178,9 @@ export default {
                 }
             }
             this.$store.commit('SET_ESTIMATE', this.estimate);
+        },
+        previous(){
+            this.$store.commit('PREVIOUS_FORM');
         }
     }
 }

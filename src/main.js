@@ -21,7 +21,7 @@ router.beforeEach(
   (to, from, next)=>{
 
     if(!to.matched.some(record => record.meta.forAuth)){ //Confirm User is a visitor, otherwise take him to an authenticated route
-      if( (localStorage.getItem('lancerlancer')) && (localStorage.getItem('lancers_expiration')) && (Date.now() < parseInt(localStorage.getItem('lancers_expiration'))) ) {
+      if( (localStorage.getItem('lancers_token')) && (localStorage.getItem('lancers_expiration')) && (Date.now() < parseInt(localStorage.getItem('lancers_expiration'))) ) {
         next({ path: '/dashboard'});
       }
       else{

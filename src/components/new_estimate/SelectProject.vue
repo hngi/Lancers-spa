@@ -2,19 +2,24 @@
     
     <div class="contaner">
 
-        <div id="container">
-
-            <div>
-                <p class="nav" id="cnc"> x </p>
-            </div>
-            <div>
-                <p class="nav" id="cre">Create Estimate</p>
-            </div>
-            <div>
-                <input class="nav" id="ext" type="button" @click.prevent="next" value="NEXT">
-            </div>
-
-        </div>
+            <header style="border-bottom: 2px solid rgb(223, 223, 223);">
+                <nav style="display: flex; ">
+                    <a href="#"  @click.prevent="$router.push('/')" class="column-1">
+                        <img
+                            src="https://res.cloudinary.com/mide358/image/upload/v1570621469/clear_24px_rasbwc.png"
+                            alt="navIcon"
+                        />
+                    </a>
+                    <a href="#" @click.prevent="previous" class="column-1">
+                        <img
+                            src="https://res.cloudinary.com/mide358/image/upload/c_scale,h_27,w_13/v1570621434/Vector_ag4hnv.png"
+                            alt="navIcon"
+                        />
+                    </a>
+                    <div class="column-2">client</div>
+                    <a href="#" @click.prevent="next" class="column-3">NEXT</a>
+                </nav>
+            </header>
 
         <h1 class="">What project are you estimating?</h1>
         <div class="row ml-auto mr-auto box justify-content-center">
@@ -22,7 +27,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">A previously created project</h5>
-                        <p class="card-text">Find estimate for a previously created project, by doing so the
+                        <p style="padding-bottom: 10px;" class="card-text">Find estimate for a previously created project, by doing so the
                             estimate
                             gets populated with some of the data. 
                         </p>
@@ -68,6 +73,9 @@ export default {
         next(){
             if(this.project.new === ''  && this.project.old === '') alert('Please select a project of specify new project title')
             else this.$store.commit('SELECT_PROJECT', this.project);
+        },
+        previous(){
+            this.$store.commit('PREVIOUS_FORM');
         }
     }
 }
