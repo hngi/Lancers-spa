@@ -34,7 +34,7 @@
         <div class="container">
 
             <div id="glac">
-                Glacier Fintech App
+                {{$store.state.estimateForm.project.title | capsfirst}}
                 <hr />
             </div>
             <hr />
@@ -177,7 +177,15 @@ export default {
                     return;
                 }
             }
-            this.$store.commit('SET_ESTIMATE', this.estimate);
+            this.$store.dispatch('postData', {address: '/estimates', data: { ...this.estimate}})
+              .then( data => {
+                  console.log(data.data.data);
+                  // this.$store.commit('SET_ESTIMATE', this.estimate);
+              })
+              .catch(e => {
+
+              });
+            
         }
     }
 }

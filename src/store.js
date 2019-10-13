@@ -28,7 +28,7 @@ export default new Vuex.Store({
     },
 
     estimateForm: {
-        step: 4,
+        step: 1,
         project: { },
         evaluation: {},
         client: {
@@ -83,16 +83,17 @@ export default new Vuex.Store({
         state.estimateForm.step = 2;
         state.estimateForm.project.type = payload.new !== '' ? 'new' : 'old';
         state.estimateForm.project.title = payload.new !== '' ? payload.new : payload.old;
+        state.estimateForm.project.project_id = payload.id;
     },
     SET_ESTIMATE: (state, payload)=>{
         state.estimateForm.step = 3;
         state.estimateForm.evaluation.hours = payload.hours, 
-        state.estimateForm.evaluation.charge_per_hour = payload.charge_per_hour, 
-        state.estimateForm.evaluation.start_date = payload.start_date, 
-        state.estimateForm.evaluation.end_date = payload.end_date, 
+        state.estimateForm.evaluation.price_per_hour = payload.price_per_hour, 
+        state.estimateForm.evaluation.start = payload.start, 
+        state.estimateForm.evaluation.end = payload.end, 
         state.estimateForm.evaluation.equipment_cost = payload.equipment_cost, 
-        state.estimateForm.evaluation.subcontractors = payload.subcontractors, 
-        state.estimateForm.evaluation.subcontractors_fee = payload.subcontractors_fee, 
+        state.estimateForm.evaluation.sub_contractors = payload.sub_contractors, 
+        state.estimateForm.evaluation.sub_contractors_cost = payload.sub_contractors_cost, 
         state.estimateForm.evaluation.similar_project = payload.similar_project, 
         state.estimateForm.evaluation.rating = payload.rating, 
         state.estimateForm.evaluation.currency = payload.currency
