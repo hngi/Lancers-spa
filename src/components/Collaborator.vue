@@ -3,16 +3,14 @@
         <td scope="row" class="rounded-left border border-right-0">
             <span class="user_avatar_link" href="">
                 <div class="user_avatar">
-                    FD
+                   {{person.name.split(" ")[0][0] + person.name.split(" ")[1][0]}}
                 </div>
             </span>
         </td>
-        <td class="border-top border-bottom text-center">David Speedo</td>
-        <td class="border-top border-bottom text-center">Product Designer</td>
+        <td class="border-top border-bottom text-center">{{person.project}}</td>
+        <td class="border-top border-bottom text-center">{{person.name}}</td>
+        <td class="border-top border-bottom text-center">{{person.designation}}</td>
         
-        <td class="border-top border-bottom text-center">
-            58%
-        </td>
         <td class="rounded-right border border-left-0 text-right">
             <div class="dropdown dropleft">
                 <a class="btn btn-white btn-sm dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -27,3 +25,17 @@
         </td>
     </tr>
 </template>
+
+<script>
+export default {
+    name: "Collaborators",
+    data: function(){
+        return {
+
+        }
+    },
+    props:{
+        person: Object
+    }
+}
+</script>

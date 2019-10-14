@@ -141,6 +141,9 @@ export default {
                 }
             }
             this.$store.commit('SET_CLIENT_INFO', this.form);
+        },
+        previous(){
+            this.$store.commit('PREVIOUS_FORM');
         }
     }
 }

@@ -24,15 +24,15 @@
                                 <thead>
                                     <tr>
                                         <th scope="col"></th>
+                                        <th class="text-center"  scope="col">Project</th>
                                         <th class="text-center"  scope="col">Name</th>
                                         <th class="text-center"  scope="col">Role</th>
-                                        <th class="text-center" scope="col">Progress</th>
                                         <th class="text-right" scope="col"></th>
                                  
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <Collaborator />                                    
+                                    <Collaborator v-for="(person, id) in collaborators" :key="id" :person="person"  />                                    
                                 </tbody>
                             </table>
                         </div>
@@ -55,16 +55,27 @@ import Collaborator from '@/components/Collaborator.vue'
 export default {
     data(){
         return {
-            
+            collaborators: [],
+            projectId: 49
         }
     },
     components: {
         'Sidenav' : Sidenav,
         'Topnav' : Topnav,
         'Collaborator' : Collaborator
+    },
+    created(){
+        this.$store.dispatch('fetchData', {address: `/projects/collaborators`})
+            .then(data => {
+                this.collaborators = data.data.data[0];
+            })
+            .catch(e => {
+
+            });
     }
 }
 </script>
+
 
 <style src='@/assets/css/base.css'></style>
 

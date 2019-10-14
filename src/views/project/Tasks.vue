@@ -24,16 +24,16 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">Date</th>
+                                        <th scope="col">Project</th>
                                         <th scope="col">Name</th>
-                                        <th scope="col">Progress
-                                        </th>
+                                        <th scope="col">Progress</th>
                                         <th class="text-left" scope="col">Status</th>
                                         <th class="text-left" scope="col">Team</th>
                                         <th scope="col"> </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <Task />
+                                    <Task v-for="(task,id) in tasks"  :key="id" :task="task"/>
                                 </tbody>
                             </table>
                         </div>
@@ -56,13 +56,23 @@ import Task from '@/components/Task.vue'
 export default {
     data(){
         return {
-            
+            tasks: []
         }
     },
     components: {
         'Sidenav' : Sidenav,
         'Topnav' : Topnav,
         'Task' : Task
+    },
+    created(){
+        this.$store.dispatch('fetchData', {address: `/tasks`})
+            .then(data => {
+                this.tasks = data.data.data;
+                // console.log(this.tasks);
+            })
+            .catch(e => {
+                console.log(e);
+            });
     }
 }
 </script>

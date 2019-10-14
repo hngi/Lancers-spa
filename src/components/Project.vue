@@ -4,14 +4,14 @@
             <span class="text-small text-muted mr-2">
                 <i class="fas fa-circle"></i>
             </span> 
-            <span class="">Mar. 10, 2019</span>
+            <span class="">{{project.created_at.split(" ")[0] | slashtime}}</span>
         </td>
         <td class="border-top border-bottom">Foodie</td>
-        <td class="border-top border-bottom">Aug. 10, 2019</td>
-        <td class="border-top border-bottom text-right">₦200,000</td>
-        <td class="border-top border-bottom text-right">₦200,000</td>
+        <td class="border-top border-bottom">{{project.estimate.start | slashtime}}</td>
+        <td class="border-top border-bottom text-right">₦{{project.invoice == null  ? 0 : project.invoice.amount_paid  | formatnum}}</td>
+        <td class="border-top border-bottom text-right">₦{{project.estimate == null ? 0 : project.estimate.estimate | formatnum}}</td>
         <td class="border-top border-bottom">
-            <span class="alert alert-primary py-0 px-2 small m-0">Completed</span>
+            <span class="alert py-2 px-2 small m-0" :class="project.status == 'pending' ? 'alert-warning' : (project.status == 'in-progress' ? 'alert-primary' : 'alert-success')">{{project.status}}</span>
         </td>
         <td class="rounded-right border border-left-0">
             <div class="dropdown dropleft">
@@ -27,3 +27,14 @@
         </td>
     </tr>
 </template>
+
+<script>
+export default {
+    props: {
+        project: Object
+    },
+    created(){
+        console.log("hee")
+    }
+}
+</script>
