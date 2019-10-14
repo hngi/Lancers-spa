@@ -6,13 +6,15 @@
             </span>
             <span class="">5/09/2019</span>
         </td>
-        <td class="border-top border-bottom">Foodie</td>
+        <td class="border-top border-bottom">{{task.project.title}}</td>
+        <td class="border-top border-bottom">{{task.name}}</td>
         <td class="border-top border-bottom">
-            <span class="alert alert-primary py-0 px-2 small m-0">Completed</span>
+            <span class="alert py-2 px-2 small m-0" :class="task.status == 'pending' ? 'alert-warning' : (task.status == 'in-progress' ? 'alert-primary' : 'alert-success')">{{task.status}}</span>
         </td>
-        <td class="border-top border-bottom text-left">₦200,000</td>
+        <td class="border-top border-bottom text-left">{{task.progress}}%</td>
         <td class="border-top border-bottom text-right">
             <div style="position: relative; left: 0; top: 0;">
+
                 <img src="https://res.cloudinary.com/memz/image/upload/v1570714781/download_2_yhhlsm.jpg"
                     width="30px" height="30px" class="woman1" />
                 <img src="https://res.cloudinary.com/memz/image/upload/v1570714759/download_3_aym7zh.jpg"
@@ -39,3 +41,17 @@
         </td>
     </tr>
 </template>
+
+<script>
+export default {
+    name: "Task",
+    props: {
+        task: Object
+    },
+    data: function(){
+        return {
+
+        }
+    }
+}
+</script>

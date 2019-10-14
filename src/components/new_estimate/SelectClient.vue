@@ -3,13 +3,13 @@
         <div class="max-con">
             <header style="border-bottom: 2px solid rgb(223, 223, 223);">
                 <nav style="display: flex; ">
-                    <a href="#" @click.prevent="previous" class="column-1">
+                    <a href="#"  @click.prevent="$router.push('/estimate')" class="column-1">
                         <img
                             src="https://res.cloudinary.com/mide358/image/upload/v1570621469/clear_24px_rasbwc.png"
                             alt="navIcon"
                         />
                     </a>
-                    <a href="#" @click.prevent="next" class="column-1">
+                    <a href="#" @click.prevent="previous" class="column-1">
                         <img
                             src="https://res.cloudinary.com/mide358/image/upload/c_scale,h_27,w_13/v1570621434/Vector_ag4hnv.png"
                             alt="navIcon"
@@ -58,6 +58,9 @@ export default {
 
         next(){
             this.$store.commit('SELECT_CLIENT', this.form);
+        },
+        previous(){
+            this.$store.commit('PREVIOUS_FORM');
         }
     }
 }
