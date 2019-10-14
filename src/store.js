@@ -28,7 +28,7 @@ export default new Vuex.Store({
     },
 
     estimateForm: {
-        step: 4,
+        step: 1,
         project: { },
         evaluation: {},
         client: {
@@ -83,19 +83,20 @@ export default new Vuex.Store({
         state.estimateForm.step = 2;
         state.estimateForm.project.type = payload.new !== '' ? 'new' : 'old';
         state.estimateForm.project.title = payload.new !== '' ? payload.new : payload.old;
+        state.estimateForm.project.project_id = payload.id;
     },
     SET_ESTIMATE: (state, payload)=>{
         state.estimateForm.step = 3;
-        state.estimateForm.evaluation.hours = payload.hours, 
-        state.estimateForm.evaluation.charge_per_hour = payload.charge_per_hour, 
-        state.estimateForm.evaluation.start_date = payload.start_date, 
-        state.estimateForm.evaluation.end_date = payload.end_date, 
+        state.estimateForm.evaluation.time = payload.time, 
+        state.estimateForm.evaluation.price_per_hour = payload.price_per_hour, 
+        state.estimateForm.evaluation.start = payload.start, 
+        state.estimateForm.evaluation.end = payload.end, 
         state.estimateForm.evaluation.equipment_cost = payload.equipment_cost, 
-        state.estimateForm.evaluation.subcontractors = payload.subcontractors, 
-        state.estimateForm.evaluation.subcontractors_fee = payload.subcontractors_fee, 
-        state.estimateForm.evaluation.similar_project = payload.similar_project, 
+        state.estimateForm.evaluation.sub_contractors = payload.sub_contractors, 
+        state.estimateForm.evaluation.sub_contractors_cost = payload.sub_contractors_cost, 
+        state.estimateForm.evaluation.similar_projects = payload.similar_projects, 
         state.estimateForm.evaluation.rating = payload.rating, 
-        state.estimateForm.evaluation.currency = payload.currency
+        state.estimateForm.evaluation.currency_id = payload.currency_id
     },
 
     SELECT_CLIENT: (state, payload)=>{
@@ -129,7 +130,6 @@ export default new Vuex.Store({
         })
         .catch(error => {
             //Send a notification to dev
-            console.log(error);
         })      
     },
 
@@ -232,7 +232,7 @@ export default new Vuex.Store({
         })
     },
 
-    postData: (context, payload) => {
+    postData: (context, payload, method='post') => {
         /**
          * SETTING REQUEST INTERCEPTOR FOR TOKEN
          **/
@@ -250,7 +250,9 @@ export default new Vuex.Store({
 
         // Returning a promise to determine if action is still loading, failed or completed successfully
         return new Promise((resolve, reject) => {
-            HNG.post(payload.address, payload.data)
+            method.toLowerCase() == 'put' ? HNG.put(payload.address, payload.data)
+            :method.toLowerCase() == 'delete' ? HNG.delete(payload.address, payload.data)
+            :HNG.post(payload.address, payload.data)
             .then(response => {
                 if(payload.address === '/register'){
                     context.commit('SET_TOKEN', {token: response.data.data.access_token, expiration: response.data.data.expires_in + Date.now()});

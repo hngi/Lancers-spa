@@ -19,7 +19,7 @@
                 </li>
             </ul>
             <div class="price-button p-3">
-                <router-link class="btn btn-primary btn-block" to="/signup">Sign up for free</router-link>
+                <router-link class="btn btn-primary btn-block" to="/register">Sign up for free</router-link>
             </div>
         </div>
     </div>

@@ -35,7 +35,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <Project />
+                                    <Project v-for="(project, id) in projects" :key="id" :project="project" />
                                 </tbody>
                             </table>
                         </div>
@@ -58,13 +58,23 @@ import Project from '@/components/Project.vue'
 export default {
     data(){
         return {
-            
+            projects: []
         }
     },
     components: {
         'Sidenav' : Sidenav,
         'Topnav' : Topnav,
         'Project' : Project
+    },
+    created(){
+        this.$store.dispatch('fetchData', {address: `/projects`})
+            .then(data => {
+                this.projects = data.data;
+                // console.log(this.tasks);
+            })
+            .catch(e => {
+                console.log(e);
+            });
     }
 }
 </script>
